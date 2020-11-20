@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div id="tron" class="jumbotron w-100">
+            <h1 class="display-3">Poor RAT<h1>
+            <p class="lead">
+                コンピュータを遠隔制御するサービス。
+            </p>
+            <hr class="my-2">
+            <p class="lead">
+                各種変更は以下よりお願いします。
+            </p>
+            <p class="lead">
+                <a href="{% url 'register:user_create' %}" class="btn btn-secondary" >会員登録</a>
+                <a href="{% url 'register:password_reset' %}" class="btn btn-secondary" >パスワード忘れ</a>
+                <a href="{% url 'operation:api' %}" class="btn btn-secondary" >APIについて</a>
+            </p>
+        </div>
+        <div class="card col-md-6 offset-md-3">
+            <div class="card-body">
+                <form action="{% url 'register:login' %}" method="POST">
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        {{ field }}
+                        {{ field.errors }}
+                        <hr>
+                    {% endfor %}
+                    <p class="text-center"><button type="submit" class="btn btn-secondary" >ログイン</button></p>
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

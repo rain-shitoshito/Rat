@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-3">
+            <form>
+                <div class="input-group mb-3">
+                    <input type="text" id="cmd" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+                    <div class="input-group-append">
+                    <button id="send" class="btn btn-secondary" type="button">送信</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-group-prepend w-100 d-flex justify-content-sm-between">
+                        <select id="target" class="custom-select">
+                            <option selected>対象を選択してください</option>
+                            <option value="ALL">ALL</option>
+                        </select>
+                        <div id="custom_file" class="custom-file" lang="es">
+                            <input type="file" class="custom-file-input" id="input_file" aria-describedby="fileHelp">
+                            <label class="custom-file-label" for="input_file">
+                               Select file...
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4">
+        
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h3 class="line_1">登録履歴</h3>
+        <table id="history" class="table">
+            <thead class="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>アドレス</th>
+                <th>コマンド</th>
+                <th>アップロードファイル</th>
+                <th>Created</th>
+                <th>レスポンス</th>
+                <th>ダウンロードファイル</th>
+                <th>Finished</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div id="history_nation" class="d-flex justify-content-sm-end">
+        </div>
+    </div>
+</div>
+{% endblock %}

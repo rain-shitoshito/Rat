@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="alert alert-dark" role="alert">
+    <strong>ログアウトしました。</strong>
+</div>
+<a href="{% url 'register:login' %}" class="btn btn-secondary">ログイン画面へ</a>
+{% endblock %}

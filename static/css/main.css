@@ -1,0 +1,34 @@
+#grd {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100%;
+    z-index: -1;
+    background: #02AAB0;
+    background: -webkit-linear-gradient(to right, #ffffff, #c1c1c1);
+    background: linear-gradient(to right, #ffffff, #c1c1c1);
+
+}
+#tron {
+    background-image: url('/static/img/sys/rat.png');
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-size: 40%;
+}
+.prettyprint ol.linenums > li {
+    list-style-type: decimal; 
+}
+.following {
+    position: sticky;
+    top: 1rem;
+}
+.line_1 {
+    line-height: 2;
+}
+@media screen and (max-width: 991px) {
+    .following {
+        position: static;
+    }
+}
