@@ -109,14 +109,16 @@ Transmission.uid = get_cookie('uid');
 					let tr = document.createElement("tr");
 					let data;
 					for(let i=0; i<keys.length; i++) {
-						if(i == 3 || i == 6)
+						if(i == 3)
 							data = obj[keys[i]] != null ? obj[keys[i]]["name"] : "null";
+						else if(i == 6)
+							data = obj[keys[i]] != null ? `<a href="${obj[keys[i]]["link"]}">${obj[keys[i]]["name"]}</a>` : "null";
 						else if(i == 5 || i == 6 || i == 7)
 							data = obj[keys[i]] != null ? obj[keys[i]] : "null";
 						else
 							data = obj[keys[i]];
 						let td = document.createElement("td");
-						td.innerText = data;
+						td.innerHTML = data;
 						tr.appendChild(td);
 					}
 					tb.appendChild(tr);
@@ -174,13 +176,33 @@ Transmission.uid = get_cookie('uid');
 	});
 
 
+	// document.getElementById("send").addEventListener("click", e => {
+	// 	const cmd = document.getElementById("cmd");
+	// 	if(cmd.value != "") {
+	// 		let content = {
+	// 			sender: Transmission.uid,
+	// 			cmd: cmd.value,
+	// 			recipient: document.getElementById("target").value,
+	// 		}
+	// 		if(file_name != null && file_content != null) {
+	// 			content["name"] = file_name;
+	// 			content["content"] = file_content;
+	// 		}
+			
+	// 		tran = new Transmission(
+	// 			"POST",
+	// 			content
+	// 		);
+	// 		tran.send("http://127.0.0.1:8000/api/command/?format=json", (data) => {
+	// 			console.log(data);
+	// 		});
+	// 	}
+	// });
 	document.getElementById("send").addEventListener("click", e => {
 		const cmd = document.getElementById("cmd");
 		if(cmd.value != "") {
 			let content = {
-				sender: Transmission.uid,
-				cmd: cmd.value,
-				recipient: document.getElementById("target").value,
+				response: cmd.value,
 			}
 			if(file_name != null && file_content != null) {
 				content["name"] = file_name;
@@ -188,35 +210,12 @@ Transmission.uid = get_cookie('uid');
 			}
 			
 			tran = new Transmission(
-				"POST",
-				content,
-				(data) => {
-					console.log(data);
-				}
+				"PATCH",
+				content
 			);
-			tran.send("http://127.0.0.1:8000/api/command/?format=json");
+			tran.send("http://127.0.0.1:8000/api/command/1/?format=json", (data) => {
+				console.log(data);
+			});
 		}
 	});
-	// document.getElementById("send").addEventListener("click", e => {
-	// 	const cmd = document.getElementById("cmd");
-	// 	if(cmd.value != "") {
-	// 		let content = {
-	// 			response: cmd.value,
-	// 		}
-	// 		if(file_name != null && file_content != null) {
-	// 			content["name"] = file_name;
-	// 			content["content"] = file_content;
-	// 			content["recipient"] = "00-FF-CE-89-86-5B";
-	// 		}
-			
-	// 		tran = new Transmission(
-	// 			"PATCH",
-	// 			content,
-	// 			(data) => {
-	// 				console.log(data);
-	// 			}
-	// 		);
-	// 		tran.send("http://127.0.0.1:8000/api/command/1/?format=json");
-	// 	}
-	// });
 }

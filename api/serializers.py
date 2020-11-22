@@ -56,9 +56,9 @@ class DownFileSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         name = validated_data['name']
-        path = getattr(settings, 'STATICFILES_DIRS', None)[0] + '\\downloads\\'
+        path = getattr(settings, 'MEDIA_ROOT', None) + '\\downloads\\'
         #仮
-        link = 'http://127.0.0.1:8000/static/downloads/'
+        link = 'http://127.0.0.1:8000/media/downloads/'
         
         def _get(p, n):
             if os.path.isfile(p + n):
