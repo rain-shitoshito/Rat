@@ -13,10 +13,7 @@ from django.template.loader import render_to_string
 from django.views import generic
 from django.core.mail import send_mail
 from django.urls import reverse_lazy, reverse
-from .forms import (
-    LoginForm, UserCreateForm, MyPasswordChangeForm,
-    MyPasswordResetForm, MySetPasswordForm, EmailChangeForm
-)
+from .forms import *
 
 User = get_user_model()
 
@@ -214,3 +211,20 @@ class EmailChangeComplete(LoginRequiredMixin, generic.TemplateView):
             request.user.save()
             logout(request)
             return super().get(request, **kwargs)
+
+class UserUpdate(LoginRequiredMixin, generic.UpdateView):
+    """ ユーザ情報確認・変更ビュー """
+    template_name = 'register/user_update.html'
+    form_class = UserUpdateForm
+    model = User
+    success_url = reverse_lazy('register:user_update_complete')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request_user'] = self.request.user
+        return kwargs
+
+
+class UserUpdateComplete(LoginRequiredMixin, generic.TemplateView):
+    """ ユーザ情報確認・変更完了 """
+    template_name = 'register/user_update_complete.html'

@@ -30,6 +30,12 @@
           <ul class="navbar-nav mr-auto">
             {% if user.is_authenticated %}
             <li>
+              <a class="nav-item nav-link" href="{% url 'register:user_update' pk=user.pk %}"">ユーザ情報</a>
+            </li>
+            <li>
+              <a class="nav-item nav-link" href="{% url 'register:email_change' %}">Email変更</a>
+            </li>
+            <li>
               <a class="nav-item nav-link" href="{% url 'register:logout' %}">ログアウト</a>
             </li>
             {% else %}

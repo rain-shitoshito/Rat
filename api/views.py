@@ -50,7 +50,7 @@ class CommandViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     )
     status_404 = Response(
                 {"detail": "見つかりませんでした。"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
     )
     
     def conf_errors(self, ser, sers):
